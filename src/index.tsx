@@ -189,10 +189,13 @@ app.post('/api/score', async (c) => {
     const apiKey = c.env.DEEPSEEK_API_KEY
 
     // 計算實際對話輪次（只計算治療師的發言）
-    const therapistMessages = conversation.filter((msg: any) => msg.role === 'assistant')
-    const conversationRounds = therapistMessages.length
+    // 注意：前端會自動發送AI客戶的第一條開場白（role='assistant'），需要排除
+    // 真正的對話應該從用戶（治療師）的第一句話開始計算
+    const userMessages = conversation.filter((msg: any) => msg.role === 'user')
+    const conversationRounds = userMessages.length
 
     console.log(`[Score] Scoring request (rounds: ${conversationRounds}, bodyPart: ${bodyPart}, role: ${role})`)
+    console.log(`[Score] Conversation details: total messages=${conversation.length}, user messages=${userMessages.length}`)
 
     // ✅ 前置驗證：如果對話為空或治療師沒有任何輸入，直接返回最低分
     if (conversationRounds === 0 || conversation.length === 0) {

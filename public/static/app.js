@@ -89,10 +89,12 @@ async function getScore() {
     console.log('🎯 開始評分...')
     
     // ✅ 前端攔截：檢查用戶是否有實際輸入
-    const therapistMessages = AppState.conversation.filter(msg => msg.role === 'assistant')
-    const userInputCount = therapistMessages.length
+    // 注意：對話輪次應該計算用戶（治療師）的發言次數，而不是AI客戶的發言
+    // AI客戶的自動開場白（role='assistant'）不應計入輪次
+    const userMessages = AppState.conversation.filter(msg => msg.role === 'user')
+    const userInputCount = userMessages.length
     
-    console.log(`📊 對話統計：總計 ${AppState.conversation.length} 條訊息，治療師發言 ${userInputCount} 次`)
+    console.log(`📊 對話統計：總計 ${AppState.conversation.length} 條訊息，用戶（治療師）發言 ${userInputCount} 次`)
     
     // ✅ 如果用戶完全沒有輸入，直接返回最低分（不調用 AI）
     if (userInputCount === 0) {
