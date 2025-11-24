@@ -16,16 +16,72 @@ app.use('/api/*', cors())
 // 數據定義
 // ========================================
 
-// 8 個身體部位
+// 8 個身體部位（含專業信息）
 const bodyParts = [
-  { id: 'neck', name: '頸部', icon: '🦴' },
-  { id: 'shoulder', name: '肩部', icon: '💪' },
-  { id: 'upper-back', name: '上背', icon: '🔺' },
-  { id: 'lower-back', name: '下背', icon: '🔻' },
-  { id: 'knee', name: '膝關節', icon: '🦵' },
-  { id: 'wrist', name: '手腕', icon: '✋' },
-  { id: 'ankle', name: '腳底和腳踋附近', icon: '🦶' },
-  { id: 'elbow', name: '手肘外側', icon: '💪' }
+  { 
+    id: 'neck', 
+    name: '頸部', 
+    icon: '🦴',
+    conditions: ['頸椎病', '落枕', '頸部僵硬'],
+    muscles: ['胸鎖乳突肌', '斜方肌', '頸夾肌'],
+    acupoints: ['風池穴', '大椎穴', '天柱穴']
+  },
+  { 
+    id: 'shoulder', 
+    name: '肩部', 
+    icon: '💪',
+    conditions: ['肩周炎', '肩頸痛', '五十肩'],
+    muscles: ['三角肌', '岡上肌', '肩胛提肌'],
+    acupoints: ['肩井穴', '肩髃穴', '曲池穴']
+  },
+  { 
+    id: 'upper-back', 
+    name: '上背', 
+    icon: '🔺',
+    conditions: ['上背痛', '駝背', '肩胛骨痛'],
+    muscles: ['菱形肌', '豎脊肌', '背闊肌'],
+    acupoints: ['膏肓穴', '大杼穴', '心俞穴']
+  },
+  { 
+    id: 'lower-back', 
+    name: '下背', 
+    icon: '🔻',
+    conditions: ['腰痛', '腰肌勞損', '椎間盤突出'],
+    muscles: ['腰方肌', '豎脊肌', '多裂肌'],
+    acupoints: ['腎俞穴', '命門穴', '腰陽關穴']
+  },
+  { 
+    id: 'knee', 
+    name: '膝關節', 
+    icon: '🦵',
+    conditions: ['膝關節炎', '髕骨軟化', '半月板損傷'],
+    muscles: ['股四頭肌', '膕繩肌', '小腿三頭肌'],
+    acupoints: ['犢鼻穴', '陽陵泉穴', '陰陵泉穴']
+  },
+  { 
+    id: 'wrist', 
+    name: '手腕', 
+    icon: '✋',
+    conditions: ['腕管綜合症', '手腕扭傷', '媽媽手'],
+    muscles: ['橈側腕屈肌', '尺側腕屈肌', '伸腕肌群'],
+    acupoints: ['陽池穴', '大陵穴', '神門穴']
+  },
+  { 
+    id: 'ankle', 
+    name: '腳底和腳踋附近', 
+    icon: '🦶',
+    conditions: ['足底筋膜炎', '足跟痛', '扁平足'],
+    muscles: ['腓腸肌', '比目魚肌', '足底筋膜'],
+    acupoints: ['太溪穴', '崑崙穴', '湧泉穴']
+  },
+  { 
+    id: 'elbow', 
+    name: '手肘外側', 
+    icon: '💪',
+    conditions: ['網球肘', '高爾夫球肘', '肘關節炎'],
+    muscles: ['肱二頭肌', '肱三頭肌', '前臂伸肌群'],
+    acupoints: ['曲池穴', '手三里穴', '少海穴']
+  }
 ]
 
 // 16 個顧客角色

@@ -193,7 +193,6 @@ function renderModeSelectionPage() {
     <div class="max-w-4xl mx-auto">
       <div class="text-center mb-8">
         <h2 class="text-3xl font-bold text-gray-800 mb-2">選擇訓練模式</h2>
-        <p class="text-gray-600">請選擇適合您的訓練方式</p>
       </div>
       
       <div class="grid md:grid-cols-2 gap-6">
@@ -214,7 +213,7 @@ function renderModeSelectionPage() {
               </li>
               <li class="flex items-start">
                 <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
-                <span class="text-gray-700">自選情境組合（8×16）</span>
+                <span class="text-gray-700">自選情境組合</span>
               </li>
               <li class="flex items-start">
                 <i class="fas fa-check-circle text-green-500 mr-3 mt-1"></i>
@@ -308,10 +307,15 @@ function renderCardSelectionPage() {
           ${AppState.bodyParts.map(part => `
             <button 
               onclick="selectBodyPart('${part.id}', '${part.name}')"
-              class="body-part-card p-4 border-2 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition duration-200 ${AppState.bodyPart === part.id ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300'}"
+              class="body-part-card p-4 border-2 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition duration-200 text-left ${AppState.bodyPart === part.id ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300'}"
             >
-              <div class="text-3xl mb-2">${part.icon}</div>
-              <div class="font-semibold text-gray-800">${part.name}</div>
+              <div class="text-3xl mb-2 text-center">${part.icon}</div>
+              <div class="font-semibold text-gray-800 mb-2 text-center">${part.name}</div>
+              <div class="text-xs text-gray-600 space-y-1">
+                <div><strong>痛症：</strong>${(part.conditions || []).join('、')}</div>
+                <div><strong>肌肉：</strong>${(part.muscles || []).join('、')}</div>
+                <div><strong>穴位：</strong>${(part.acupoints || []).join('、')}</div>
+              </div>
             </button>
           `).join('')}
         </div>
@@ -331,7 +335,6 @@ function renderCardSelectionPage() {
             >
               <div class="font-semibold text-gray-800 mb-1">${role.name}</div>
               <div class="text-sm text-gray-600">${role.age}歲 · ${role.occupation}</div>
-              <div class="text-xs text-gray-500 mt-1">${role.profile}</div>
             </button>
           `).join('')}
         </div>
