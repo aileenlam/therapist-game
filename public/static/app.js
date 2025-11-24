@@ -415,6 +415,137 @@ function renderCardSelectionPage() {
   `
 }
 
+// 面試模式抽卡頁面
+function renderInterviewCardRevealPage() {
+  if (AppState.bodyParts.length === 0 || AppState.customerRoles.length === 0) {
+    return `
+      <div class="text-center py-12">
+        <i class="fas fa-spinner fa-spin text-4xl text-indigo-600 mb-4"></i>
+        <p class="text-gray-600">載入中...</p>
+      </div>
+    `
+  }
+  
+  const bodyPart = AppState.bodyPartDetails || {}
+  const role = AppState.customerRoleDetails || {}
+  
+  return `
+    <div class="max-w-5xl mx-auto">
+      <!-- 標題 -->
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">
+          <i class="fas fa-clock text-red-600 mr-2"></i>
+          面試模式 - 系統隨機抽卡
+        </h2>
+        <p class="text-gray-600">以下是系統為您隨機抽取的情境組合</p>
+      </div>
+      
+      <!-- 抽卡結果展示 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- 身體部位卡片 -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl shadow-2xl p-6 transform hover:scale-105 transition duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-indigo-900">
+              <i class="fas fa-user-injured mr-2"></i>
+              身體部位
+            </h3>
+            <div class="text-5xl">${bodyPart.icon || '🦴'}</div>
+          </div>
+          
+          <div class="bg-white rounded-xl p-4 mb-4">
+            <div class="text-2xl font-bold text-indigo-900 mb-3 text-center">
+              ${AppState.bodyPartName}
+            </div>
+            
+            <div class="space-y-2 text-sm">
+              <div class="flex items-start">
+                <span class="inline-block px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-semibold mr-2">痛症</span>
+                <span class="text-gray-700 flex-1">${(bodyPart.conditions || []).join('、')}</span>
+              </div>
+              <div class="flex items-start">
+                <span class="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold mr-2">肌肉</span>
+                <span class="text-gray-700 flex-1">${(bodyPart.muscles || []).join('、')}</span>
+              </div>
+              <div class="flex items-start">
+                <span class="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-semibold mr-2">穴位</span>
+                <span class="text-gray-700 flex-1">${(bodyPart.acupoints || []).join('、')}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 客戶角色卡片 -->
+        <div class="bg-gradient-to-br from-purple-50 to-pink-100 rounded-2xl shadow-2xl p-6 transform hover:scale-105 transition duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-purple-900">
+              <i class="fas fa-user mr-2"></i>
+              客戶角色
+            </h3>
+            <div class="text-5xl">👤</div>
+          </div>
+          
+          <div class="bg-white rounded-xl p-4 mb-4">
+            <div class="text-2xl font-bold text-purple-900 mb-2 text-center">
+              ${role.name}
+            </div>
+            <div class="text-center text-gray-600 mb-3">
+              ${role.age}歲 · ${role.occupation}
+            </div>
+            
+            <div class="text-sm text-gray-700 bg-purple-50 rounded-lg p-3">
+              <div class="font-semibold text-purple-900 mb-1">
+                <i class="fas fa-info-circle mr-1"></i>
+                客戶特徵：
+              </div>
+              ${role.profile || '一般客戶'}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 提示信息 -->
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded">
+        <div class="flex items-start">
+          <i class="fas fa-lightbulb text-yellow-600 text-xl mr-3 mt-1"></i>
+          <div>
+            <p class="text-sm text-yellow-800 font-semibold mb-1">面試提示</p>
+            <p class="text-sm text-yellow-700">
+              面試時間限制為 <strong>15 分鐘</strong>。請根據抽到的身體部位和客戶角色，展示您的專業溝通能力、提問技巧、方案解釋和異議處理能力。
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 操作按鈕 -->
+      <div class="flex justify-center space-x-4">
+        <button 
+          onclick="goToModeSelection()"
+          class="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition duration-200"
+        >
+          <i class="fas fa-arrow-left mr-2"></i>
+          返回主頁
+        </button>
+        
+        <button 
+          onclick="redrawCards()"
+          class="px-8 py-3 border-2 border-indigo-500 text-indigo-600 bg-white rounded-lg font-semibold hover:bg-indigo-50 transition duration-200"
+        >
+          <i class="fas fa-sync-alt mr-2"></i>
+          重新抽卡
+        </button>
+        
+        <button 
+          onclick="confirmInterviewStart()"
+          class="px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg font-semibold hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transition duration-200"
+        >
+          <i class="fas fa-play-circle mr-2"></i>
+          開始面試
+        </button>
+      </div>
+    </div>
+  `
+}
+
 function renderConversationPage() {
   const isInterview = AppState.mode === 'interview'
   
@@ -807,6 +938,9 @@ function render() {
     case 'card-selection':
       content = renderCardSelectionPage()
       break
+    case 'interview-card-reveal':
+      content = renderInterviewCardRevealPage()
+      break
     case 'conversation':
       content = renderConversationPage()
       break
@@ -871,23 +1005,35 @@ async function selectMode(mode) {
     await fetchCustomerRoles()
     AppState.currentPage = 'card-selection'
   } else {
-    // 面試模式：隨機抽取
+    // 面試模式：隨機抽取並顯示抽卡頁面
     await fetchBodyParts()
     await fetchCustomerRoles()
     
-    const randomBodyPart = AppState.bodyParts[Math.floor(Math.random() * AppState.bodyParts.length)]
-    const randomRole = AppState.customerRoles[Math.floor(Math.random() * AppState.customerRoles.length)]
+    // 隨機抽取身體部位和客戶角色
+    randomDrawCards()
     
-    AppState.bodyPart = randomBodyPart.id
-    AppState.bodyPartName = randomBodyPart.name
-    AppState.customerRole = randomRole.id
-    AppState.customerRoleName = randomRole.name
-    AppState.timeRemaining = 900 // 15 minutes
-    
-    startConversation()
+    // 跳轉到抽卡確認頁面
+    AppState.currentPage = 'interview-card-reveal'
   }
   
   render()
+}
+
+// 隨機抽卡函數
+function randomDrawCards() {
+  const randomBodyPart = AppState.bodyParts[Math.floor(Math.random() * AppState.bodyParts.length)]
+  const randomRole = AppState.customerRoles[Math.floor(Math.random() * AppState.customerRoles.length)]
+  
+  AppState.bodyPart = randomBodyPart.id
+  AppState.bodyPartName = randomBodyPart.name
+  AppState.bodyPartIcon = randomBodyPart.icon
+  AppState.bodyPartDetails = randomBodyPart
+  AppState.customerRole = randomRole.id
+  AppState.customerRoleName = randomRole.name
+  AppState.customerRoleDetails = randomRole
+  AppState.timeRemaining = 900 // 15 minutes
+  
+  console.log(`🎴 隨機抽卡：${randomBodyPart.name} + ${randomRole.name}`)
 }
 
 function goToModeSelection() {
@@ -929,6 +1075,19 @@ function selectCustomerRole(id, name) {
   }
   
   render()
+}
+
+// 重新抽卡（面試模式）
+function redrawCards() {
+  console.log('🔄 重新抽卡...')
+  randomDrawCards()
+  render()
+}
+
+// 確認開始面試（面試模式）
+function confirmInterviewStart() {
+  console.log('✅ 確認開始面試')
+  startConversation()
 }
 
 async function startConversation() {
