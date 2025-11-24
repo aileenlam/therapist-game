@@ -371,7 +371,7 @@ app.get('/api/assessments', async (c) => {
 // 前端路由
 // ========================================
 
-// 主頁（將在下一步實現完整 UI）
+// 主頁 - 完整前端應用
 app.get('/', (c) => {
   return c.html(`
     <!DOCTYPE html>
@@ -385,66 +385,32 @@ app.get('/', (c) => {
     </head>
     <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
         <div class="container mx-auto px-4 py-8">
+            <!-- Header -->
             <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold text-indigo-900 mb-4">
+                <h1 class="text-4xl font-bold text-indigo-900 mb-2">
                     <i class="fas fa-user-md mr-3"></i>
                     痛症治療師評測及培訓系統
                 </h1>
-                <p class="text-lg text-gray-700">v2.0 - 全新架構，穩定可靠</p>
+                <p class="text-sm text-gray-600">v2.0 - Powered by AI · ACADEMI Standards</p>
             </div>
 
-            <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
-                <div class="text-center">
-                    <div class="mb-8">
-                        <i class="fas fa-check-circle text-green-500 text-6xl mb-4"></i>
-                        <h2 class="text-2xl font-bold text-gray-800 mb-2">後端 API 已就緒</h2>
-                        <p class="text-gray-600">所有核心功能已完成構建</p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4 mb-8">
-                        <div class="bg-green-50 p-4 rounded-lg">
-                            <i class="fas fa-lock text-green-600 text-2xl mb-2"></i>
-                            <p class="font-semibold text-green-800">密碼驗證</p>
-                            <p class="text-sm text-gray-600">/api/verify-password</p>
-                        </div>
-                        <div class="bg-blue-50 p-4 rounded-lg">
-                            <i class="fas fa-database text-blue-600 text-2xl mb-2"></i>
-                            <p class="font-semibold text-blue-800">數據 API</p>
-                            <p class="text-sm text-gray-600">/api/body-parts</p>
-                        </div>
-                        <div class="bg-purple-50 p-4 rounded-lg">
-                            <i class="fas fa-comments text-purple-600 text-2xl mb-2"></i>
-                            <p class="font-semibold text-purple-800">AI 對話</p>
-                            <p class="text-sm text-gray-600">/api/chat</p>
-                        </div>
-                        <div class="bg-orange-50 p-4 rounded-lg">
-                            <i class="fas fa-chart-line text-orange-600 text-2xl mb-2"></i>
-                            <p class="font-semibold text-orange-800">智能評分</p>
-                            <p class="text-sm text-gray-600">/api/score</p>
-                        </div>
-                    </div>
-
-                    <div class="text-left bg-gray-50 p-4 rounded-lg">
-                        <p class="font-semibold mb-2 text-gray-800">
-                            <i class="fas fa-info-circle mr-2"></i>下一步：
-                        </p>
-                        <ul class="text-sm text-gray-700 space-y-1">
-                            <li>✅ 後端 API 完成（7個端點）</li>
-                            <li>🔄 正在構建前端 UI...</li>
-                            <li>⏳ 設置 D1 數據庫</li>
-                            <li>⏳ 完整功能測試</li>
-                        </ul>
-                    </div>
-                </div>
+            <!-- Main App Container -->
+            <div id="app">
+                <!-- Dynamic content will be rendered here -->
             </div>
 
-            <div class="text-center mt-8 text-gray-600">
+            <!-- Footer -->
+            <div class="text-center mt-8 text-gray-600 text-sm">
                 <p>
                     <i class="fas fa-code mr-2"></i>
                     Built with Hono + Cloudflare Workers + DeepSeek AI
                 </p>
             </div>
         </div>
+
+        <!-- Scripts -->
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script src="/static/app.js"></script>
     </body>
     </html>
   `)
