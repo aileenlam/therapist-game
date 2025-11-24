@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { getCustomerRolePrompt } from './customerRolesData'
 
 // Type definitions
 type Bindings = {
@@ -141,27 +142,8 @@ app.post('/api/chat', async (c) => {
 
     console.log(`[Chat] New message (bodyPart: ${bodyPart}, role: ${role})`)
 
-    // 構建系統 Prompt
-    const systemPrompt = `你是一位正在尋求痛症治療的顧客（${role}），主要問題是「${bodyPart}」疼痛。
-
-**角色設定**：
-- 你是真實的顧客，不是治療師
-- 你會根據對方的問題和解釋做出自然的回應
-- 你可能會有疑慮、擔心、或提出異議
-
-**回應原則**：
-1. 簡短自然（20-50字）
-2. 根據對話進展逐步表達你的顧慮
-3. 如果對方解釋清楚，你會逐漸信任
-4. 如果對方沒有了解你的需求，你會感到不滿
-
-**常見異議類型**：
-- 價格疑慮：「會不會很貴？」
-- 效果質疑：「真的有用嗎？」
-- 時間問題：「需要治療多久？」
-- 比較競品：「按摩/針灸是否更好？」
-
-請扮演好顧客角色，讓對話盡可能真實。`
+    // ✅ 使用完整的角色設定 Prompt（來自角色設定.docx）
+    const systemPrompt = getCustomerRolePrompt(role, bodyPart)
 
     // 調用 DeepSeek API
     const response = await fetch('https://api.deepseek.com/chat/completions', {

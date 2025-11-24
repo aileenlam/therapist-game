@@ -416,8 +416,11 @@ function renderCardSelectionPage() {
 function renderConversationPage() {
   const isInterview = AppState.mode === 'interview'
   
+  // 獲取當前身體部位的提示卡資訊
+  const bodyPartInfo = AppState.bodyParts.find(bp => bp.name === AppState.bodyPartName) || {}
+  
   return `
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="bg-white rounded-2xl shadow-xl p-4 mb-4">
         <div class="flex justify-between items-center">
@@ -444,57 +447,129 @@ function renderConversationPage() {
         </div>
       </div>
       
-      <!-- 對話區域 -->
-      <div class="bg-white rounded-2xl shadow-xl p-6 mb-4" style="height: 500px; overflow-y: auto;" id="chat-container">
-        <div id="messages">
-          ${AppState.conversation.length === 0 ? `
-            <div class="text-center py-12 text-gray-500">
-              <i class="fas fa-comments text-4xl mb-4"></i>
-              <p>開始您的對話吧！</p>
-            </div>
-          ` : AppState.conversation.map(msg => `
-            <div class="mb-4 ${msg.role === 'assistant' ? 'text-left' : 'text-right'}">
-              <div class="inline-block max-w-[70%] ${msg.role === 'assistant' ? 'bg-gray-100' : 'bg-indigo-600 text-white'} rounded-lg px-4 py-3">
-                <div class="text-xs ${msg.role === 'assistant' ? 'text-gray-600' : 'text-indigo-200'} mb-1">
-                  ${msg.role === 'assistant' ? '顧客' : '治療師'}
+      <!-- 主要內容區域：左側對話 + 右側提示卡 -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- 左側對話區域（佔 2/3 寬度） -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- 對話區域 -->
+          <div class="bg-white rounded-2xl shadow-xl p-6" style="height: 500px; overflow-y: auto;" id="chat-container">
+            <div id="messages">
+              ${AppState.conversation.length === 0 ? `
+                <div class="text-center py-12 text-gray-500">
+                  <i class="fas fa-comments text-4xl mb-4"></i>
+                  <p>開始您的對話吧！</p>
+                  <p class="text-sm mt-2">右側有提示卡可供參考</p>
                 </div>
-                <div class="text-sm">${msg.content}</div>
-              </div>
+              ` : AppState.conversation.map(msg => `
+                <div class="mb-4 ${msg.role === 'assistant' ? 'text-left' : 'text-right'}">
+                  <div class="inline-block max-w-[70%] ${msg.role === 'assistant' ? 'bg-gray-100' : 'bg-indigo-600 text-white'} rounded-lg px-4 py-3">
+                    <div class="text-xs ${msg.role === 'assistant' ? 'text-gray-600' : 'text-indigo-200'} mb-1">
+                      ${msg.role === 'assistant' ? '顧客' : '治療師'}
+                    </div>
+                    <div class="text-sm">${msg.content}</div>
+                  </div>
+                </div>
+              `).join('')}
             </div>
-          `).join('')}
-        </div>
-        <div id="loading-indicator" class="hidden text-center py-4">
-          <i class="fas fa-spinner fa-spin text-indigo-600"></i>
-          <span class="ml-2 text-gray-600">AI 正在回應...</span>
-        </div>
-      </div>
-      
-      <!-- 輸入區域 -->
-      <div class="bg-white rounded-2xl shadow-xl p-4">
-        <div class="flex space-x-2">
-          <input 
-            type="text" 
-            id="message-input"
-            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="輸入您的訊息..."
-            onkeypress="if(event.key==='Enter') sendMessage()"
-          >
-          <button 
-            onclick="sendMessage()"
-            class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition duration-200"
-          >
-            <i class="fas fa-paper-plane"></i>
-          </button>
+            <div id="loading-indicator" class="hidden text-center py-4">
+              <i class="fas fa-spinner fa-spin text-indigo-600"></i>
+              <span class="ml-2 text-gray-600">AI 正在回應...</span>
+            </div>
+          </div>
+          
+          <!-- 輸入區域 -->
+          <div class="bg-white rounded-2xl shadow-xl p-4">
+            <div class="flex space-x-2">
+              <input 
+                type="text" 
+                id="message-input"
+                class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="輸入您的訊息..."
+                onkeypress="if(event.key==='Enter') sendMessage()"
+              >
+              <button 
+                onclick="sendMessage()"
+                class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition duration-200"
+              >
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+            
+            <div class="mt-4 text-center">
+              <button 
+                onclick="endConversation()"
+                class="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition duration-200"
+              >
+                <i class="fas fa-stop mr-2"></i>
+                結束${isInterview ? '面試' : '練習'}
+              </button>
+            </div>
+          </div>
         </div>
         
-        <div class="mt-4 text-center">
-          <button 
-            onclick="endConversation()"
-            class="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition duration-200"
-          >
-            <i class="fas fa-stop mr-2"></i>
-            結束${isInterview ? '面試' : '練習'}
-          </button>
+        <!-- 右側提示卡（佔 1/3 寬度） -->
+        <div class="lg:col-span-1">
+          <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl shadow-xl p-6 sticky top-4">
+            <h3 class="text-lg font-bold text-indigo-800 mb-4 flex items-center">
+              <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+              專業提示卡
+            </h3>
+            
+            <!-- 身體部位名稱 -->
+            <div class="mb-4 bg-white rounded-lg p-4 shadow-sm">
+              <div class="flex items-center mb-2">
+                <span class="text-2xl mr-2">${bodyPartInfo.icon || '🦴'}</span>
+                <h4 class="font-bold text-gray-800">${AppState.bodyPartName}</h4>
+              </div>
+            </div>
+            
+            <!-- 常見痛症問題 -->
+            <div class="mb-4 bg-white rounded-lg p-4 shadow-sm">
+              <h5 class="font-semibold text-gray-700 mb-2 flex items-center">
+                <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+                常見痛症問題
+              </h5>
+              <div class="flex flex-wrap gap-2">
+                ${(bodyPartInfo.conditions || []).map(condition => `
+                  <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">${condition}</span>
+                `).join('')}
+              </div>
+            </div>
+            
+            <!-- 相關肌肉組織 -->
+            <div class="mb-4 bg-white rounded-lg p-4 shadow-sm">
+              <h5 class="font-semibold text-gray-700 mb-2 flex items-center">
+                <i class="fas fa-dumbbell text-blue-500 mr-2"></i>
+                相關肌肉組織
+              </h5>
+              <div class="flex flex-wrap gap-2">
+                ${(bodyPartInfo.muscles || []).map(muscle => `
+                  <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">${muscle}</span>
+                `).join('')}
+              </div>
+            </div>
+            
+            <!-- 經絡穴位名稱 -->
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+              <h5 class="font-semibold text-gray-700 mb-2 flex items-center">
+                <i class="fas fa-compass text-green-500 mr-2"></i>
+                經絡穴位名稱
+              </h5>
+              <div class="flex flex-wrap gap-2">
+                ${(bodyPartInfo.acupoints || []).map(acupoint => `
+                  <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">${acupoint}</span>
+                `).join('')}
+              </div>
+            </div>
+            
+            <!-- 提示說明 -->
+            <div class="mt-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+              <p class="text-xs text-yellow-800">
+                <i class="fas fa-info-circle mr-1"></i>
+                這些資訊可以幫助您在對話中展示專業知識
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
