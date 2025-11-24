@@ -723,8 +723,13 @@ function renderReportPage() {
   const improvements = scoreData.improvements || scores.improvements || []
   const detailedFeedback = scoreData.detailedFeedback || scores.detailedFeedback || '暫無詳細評語'
   
-  const level = total >= 60 ? '優秀' : total >= 40 ? '良好' : total >= 20 ? '及格' : '需加強'
-  const levelColor = total >= 60 ? 'green' : total >= 40 ? 'blue' : total >= 20 ? 'yellow' : 'red'
+  // ✅ 評分等級標準（根據用戶要求）
+  // 80+ = 優秀（綠色）
+  // 60-79 = 合格（藍色）
+  // 40-59 = 仍需努力（黃色）
+  // <40 = 有待加強（紅色）
+  const level = total >= 80 ? '優秀' : total >= 60 ? '合格' : total >= 40 ? '仍需努力' : '有待加強'
+  const levelColor = total >= 80 ? 'green' : total >= 60 ? 'blue' : total >= 40 ? 'yellow' : 'red'
   
   console.log('📊 渲染報告頁面:', { scoreData, scores, strengths, improvements, total })
   
@@ -870,8 +875,13 @@ function renderHistoryPage() {
       <div class="space-y-4 mb-8">
         ${AppState.assessments.map((assessment, index) => {
           const total = assessment.total_score
-          const level = total >= 60 ? '優秀' : total >= 40 ? '良好' : total >= 20 ? '及格' : '需加強'
-          const levelColor = total >= 60 ? 'green' : total >= 40 ? 'blue' : total >= 20 ? 'yellow' : 'red'
+          // ✅ 修正：統一評分等級標準（與報告頁面一致）
+          // 80+ = 優秀（綠色）
+          // 60-79 = 合格（藍色）
+          // 40-59 = 仍需努力（黃色）
+          // <40 = 有待加強（紅色）
+          const level = total >= 80 ? '優秀' : total >= 60 ? '合格' : total >= 40 ? '仍需努力' : '有待加強'
+          const levelColor = total >= 80 ? 'green' : total >= 60 ? 'blue' : total >= 40 ? 'yellow' : 'red'
           
           return `
             <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition duration-300">
