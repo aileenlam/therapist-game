@@ -87,6 +87,56 @@ async function sendChatMessage(message) {
 async function getScore() {
   try {
     console.log('🎯 開始評分...')
+    
+    // ✅ 前端攔截：檢查用戶是否有實際輸入
+    const therapistMessages = AppState.conversation.filter(msg => msg.role === 'assistant')
+    const userInputCount = therapistMessages.length
+    
+    console.log(`📊 對話統計：總計 ${AppState.conversation.length} 條訊息，治療師發言 ${userInputCount} 次`)
+    
+    // ✅ 如果用戶完全沒有輸入，直接返回最低分（不調用 AI）
+    if (userInputCount === 0) {
+      console.log('⚠️ 前端攔截：用戶無任何輸入，返回最低分')
+      return {
+        scores: {
+          communication: 1,
+          questioning: 1,
+          explanation: 1,
+          objection: 1
+        },
+        strengths: [],
+        improvements: [
+          '未進行任何對話',
+          '請主動與顧客打招呼',
+          '建議了解顧客的痛症情況',
+          '需要展示基本的溝通能力'
+        ],
+        detailedFeedback: '本次練習您完全沒有參與對話。作為痛症治療師，主動溝通是最基本的職業要求。建議您：1) 主動問候顧客並自我介紹，2) 詢問顧客的痛症位置、強度和持續時間，3) 展示同理心和專業態度，4) 提供初步的建議或解決方案。請重新開始練習，至少進行 3-5 輪完整對話。'
+      }
+    }
+    
+    // ✅ 如果只有 1 次輸入，給予低分警告
+    if (userInputCount === 1) {
+      console.log('⚠️ 前端攔截：對話過少（僅 1 輪），返回低分')
+      return {
+        scores: {
+          communication: 3,
+          questioning: 2,
+          explanation: 1,
+          objection: 1
+        },
+        strengths: ['已嘗試開始對話'],
+        improvements: [
+          '對話輪次嚴重不足（僅 1 輪）',
+          '未能深入了解顧客需求',
+          '缺少完整的對話流程',
+          '建議進行至少 3-5 輪對話'
+        ],
+        detailedFeedback: '本次練習僅進行了 1 輪對話，無法展示您的專業能力。完整的痛症諮詢流程應包括：1) 建立信任關係（問候、自我介紹），2) 詳細詢問痛症情況（位置、強度、頻率、誘因），3) 解釋治療方案和預期效果，4) 處理顧客的疑慮和異議。請重新練習，進行更完整的對話。'
+      }
+    }
+    
+    // 正常情況：調用 AI 評分
     const response = await axios.post('/api/score', {
       conversation: AppState.conversation,
       bodyPart: AppState.bodyPartName,
@@ -102,14 +152,14 @@ async function getScore() {
     return {
       error: true,
       scores: {
-        communication: 10,
-        questioning: 10,
-        explanation: 10,
-        objection: 10
+        communication: 1,
+        questioning: 1,
+        explanation: 1,
+        objection: 1
       },
-      strengths: ['已完成對話練習'],
-      improvements: ['評分系統暫時無法使用'],
-      detailedFeedback: '由於技術問題，暫時無法生成詳細評分。'
+      strengths: [],
+      improvements: ['評分系統暫時無法使用，請稍後再試'],
+      detailedFeedback: '由於技術問題，暫時無法生成詳細評分。請稍後重試或聯繫管理員。'
     }
   }
 }
