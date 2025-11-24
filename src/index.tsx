@@ -206,56 +206,106 @@ app.post('/api/score', async (c) => {
     const { conversation, bodyPart, role } = await c.req.json()
     const apiKey = c.env.DEEPSEEK_API_KEY
 
-    console.log(`[Score] Scoring request (rounds: ${conversation.length / 2}, bodyPart: ${bodyPart}, role: ${role})`)
+    // 計算實際對話輪次（只計算治療師的發言）
+    const therapistMessages = conversation.filter((msg: any) => msg.role === 'assistant')
+    const conversationRounds = therapistMessages.length
 
-    // ACADEMI 專業評分標準 Prompt
-    const scoringPrompt = `你是 ACADEMI 痛症治療師培訓的專業評分專家。請根據以下對話記錄，評估治療師的表現。
+    console.log(`[Score] Scoring request (rounds: ${conversationRounds}, bodyPart: ${bodyPart}, role: ${role})`)
 
-**評分對話**：
+    // ✅ 前置驗證：如果對話為空或治療師沒有任何輸入，直接返回最低分
+    if (conversationRounds === 0 || conversation.length === 0) {
+      console.log('[Score] Empty conversation detected - returning minimum scores')
+      return c.json({
+        scores: {
+          communication: 1,
+          questioning: 1,
+          explanation: 1,
+          objection: 1
+        },
+        strengths: [],
+        improvements: ['未進行任何對話', '請開始與顧客互動', '建議先了解顧客的痛症情況'],
+        detailedFeedback: '本次練習未進行任何對話。建議您主動與顧客打招呼，詢問痛症情況，展示專業的溝通能力。每次練習至少應進行 3-5 輪完整對話，才能有效評估您的專業表現。'
+      })
+    }
+
+    // ✅ 檢查對話是否過於簡短（少於 2 輪）
+    if (conversationRounds < 2) {
+      console.log('[Score] Too few conversation rounds - returning low scores')
+      return c.json({
+        scores: {
+          communication: 3,
+          questioning: 2,
+          explanation: 1,
+          objection: 1
+        },
+        strengths: ['已嘗試開始對話'],
+        improvements: ['對話輪次不足，無法全面評估', '建議進行至少 3-5 輪對話', '需要更深入了解顧客需求'],
+        detailedFeedback: '本次練習對話輪次過少（僅 ${conversationRounds} 輪），無法完整展示您的專業能力。建議您進行更完整的對話流程：1) 主動問候與建立信任，2) 詳細詢問痛症情況，3) 介紹治療方案，4) 處理顧客疑慮。建議每次練習進行 3-5 輪完整對話。'
+      })
+    }
+
+    // ACADEMI 專業評分標準 Prompt（嚴格版）
+    const scoringPrompt = `你是 ACADEMI 痛症治療師培訓的專業評分專家。請根據以下對話記錄，**嚴格、客觀**地評估治療師的表現。
+
+**評分對話**（共 ${conversationRounds} 輪）：
 ${conversation.map((msg: any) => `${msg.role === 'assistant' ? '治療師' : '顧客'}: ${msg.content}`).join('\n')}
 
-**評分標準（共 80 分）**：
+**評分標準（總分 80 分，每項 1-20 分）**：
 
-1. **溝通能力 (20分)**：
+1. **溝通能力 (1-20分)**：
    - 禮貌、同理心、積極聆聽
    - 語氣友善、建立信任
    - 回應及時、清晰
+   - **評分標準**：10分=基本禮貌，15分=良好溝通，20分=卓越同理心
 
-2. **提問技巧 (20分)**：
+2. **提問技巧 (1-20分)**：
    - 開放式問題（「怎麼樣？」「什麼時候開始？」）
    - 針對性問題（痛症位置、強度、頻率）
    - 了解需求和期望
+   - **評分標準**：10分=基本提問，15分=針對性提問，20分=專業深入
 
-3. **方案解釋 (20分)**：
+3. **方案解釋 (1-20分)**：
    - 清晰介紹治療方案
    - 強調改善生活質量的價值
    - 避免醫學術語，用顧客能理解的語言
+   - **評分標準**：10分=簡單說明，15分=清晰解釋，20分=專業且易懂
 
-4. **異議處理 (20分)**：
+4. **異議處理 (1-20分)**：
    - 使用 FFF 法：Feel（同理）→ Felt（共鳴）→ Found（解決）
    - 正面回應顧客疑慮
    - 提供案例或證據
+   - **評分標準**：10分=基本回應，15分=有效處理，20分=完美化解
 
-**嚴格禁止行為**（如出現扣 10 分/次）：
+**嚴格禁止行為**（每次扣 10 分）：
 - 討論醫學證據/研究
 - 報具體價格
 - 聲稱醫療效果
 - 引用統計數據
 
+**評分原則**：
+- ❌ 如果治療師在某個維度**完全沒有表現**，該項給 1-5 分
+- ⚠️  如果治療師只有**基本表現**，該項給 6-12 分
+- ✅ 如果治療師表現**良好**，該項給 13-17 分
+- 🌟 只有表現**卓越**，該項才給 18-20 分
+
 **輸出格式**（必須嚴格遵守 JSON 格式）：
 {
   "scores": {
-    "communication": 0-20,
-    "questioning": 0-20,
-    "explanation": 0-20,
-    "objection": 0-20
+    "communication": 1-20之間的整數,
+    "questioning": 1-20之間的整數,
+    "explanation": 1-20之間的整數,
+    "objection": 1-20之間的整數
   },
-  "strengths": ["優點1", "優點2", "優點3"],
-  "improvements": ["改進1", "改進2", "改進3"],
-  "detailedFeedback": "詳細的專業評語（200-300字）"
+  "strengths": ["具體優點1（需有實際對話支持）", "具體優點2", "具體優點3"],
+  "improvements": ["具體改進建議1", "具體改進建議2", "具體改進建議3"],
+  "detailedFeedback": "詳細的專業評語（200-300字），必須基於實際對話內容，指出具體表現和改進方向"
 }
 
-**注意**：每個維度最低給 1 分，確保 JSON 格式完全正確。`
+**重要**：
+1. 每個分數必須是 1-20 之間的整數
+2. 評語必須基於實際對話內容，不可給予不符合表現的高分
+3. 如果對話輪次少於 3 輪，總分不應超過 40 分
+4. 確保 JSON 格式完全正確，不要添加任何註釋`
 
     // 調用 DeepSeek Scoring API
     const response = await fetch('https://api.deepseek.com/chat/completions', {
@@ -294,13 +344,35 @@ ${conversation.map((msg: any) => `${msg.role === 'assistant' ? '治療師' : '�
       throw new Error('評分數據解析失敗')
     }
 
-    // 驗證數據結構
+    // ✅ 驗證並修正分數範圍（確保每項 1-20 分，總分 4-80 分）
     const { scores } = scoreData
     if (!scores || typeof scores.communication !== 'number') {
       throw new Error('評分數據格式錯誤')
     }
 
-    console.log(`[Score] Scoring completed: Communication=${scores.communication}, Questioning=${scores.questioning}, Explanation=${scores.explanation}, Objection=${scores.objection}`)
+    // 強制分數範圍限制
+    const clampScore = (score: number): number => {
+      return Math.max(1, Math.min(20, Math.round(score)))
+    }
+
+    scores.communication = clampScore(scores.communication)
+    scores.questioning = clampScore(scores.questioning)
+    scores.explanation = clampScore(scores.explanation)
+    scores.objection = clampScore(scores.objection)
+
+    const totalScore = scores.communication + scores.questioning + scores.explanation + scores.objection
+
+    console.log(`[Score] Scoring completed: Communication=${scores.communication}, Questioning=${scores.questioning}, Explanation=${scores.explanation}, Objection=${scores.objection}, Total=${totalScore}/80`)
+
+    // ✅ 二次驗證：如果對話輪次少但分數過高，進行調整
+    if (conversationRounds < 3 && totalScore > 40) {
+      console.log(`[Score] Adjusting scores due to low conversation rounds (${conversationRounds} rounds, original total: ${totalScore})`)
+      const scaleFactor = Math.min(1, 40 / totalScore)
+      scores.communication = Math.max(1, Math.round(scores.communication * scaleFactor))
+      scores.questioning = Math.max(1, Math.round(scores.questioning * scaleFactor))
+      scores.explanation = Math.max(1, Math.round(scores.explanation * scaleFactor))
+      scores.objection = Math.max(1, Math.round(scores.objection * scaleFactor))
+    }
 
     return c.json(scoreData)
   } catch (error) {
@@ -308,14 +380,14 @@ ${conversation.map((msg: any) => `${msg.role === 'assistant' ? '治療師' : '�
     return c.json({
       error: '評分系統暫時無法使用',
       scores: {
-        communication: 10,
-        questioning: 10,
-        explanation: 10,
-        objection: 10
+        communication: 1,
+        questioning: 1,
+        explanation: 1,
+        objection: 1
       },
-      strengths: ['已完成對話練習'],
+      strengths: [],
       improvements: ['評分系統維護中，請稍後再試'],
-      detailedFeedback: '由於技術問題，暫時無法生成詳細評分。請稍後重試或聯繫管理員。'
+      detailedFeedback: '由於技術問題，暫時無法生成詳細評分。請稍後重試或聯繫管理員。系統會在恢復後提供完整的專業評估。'
     }, 500)
   }
 })
