@@ -1095,13 +1095,17 @@ async function startConversation() {
   AppState.currentPage = 'conversation'
   render()
   
-  // 自動發送第一條顧客消息
-  setTimeout(async () => {
-    const firstMessage = await sendChatMessage('你好')
-    AppState.conversation.push({ role: 'assistant', content: firstMessage })
-    render()
-    scrollToBottom()
-  }, 500)
+  // ✅ 修正：不自動發送客戶消息
+  // 對話應該由用戶（治療師）主動開始，而不是由AI客戶先說話
+  // 這樣可以避免AI說出「有什麼可以幫到你」這種治療師才會說的話
+  // 
+  // 舊邏輯（錯誤）：
+  // setTimeout(async () => {
+  //   const firstMessage = await sendChatMessage('你好')
+  //   AppState.conversation.push({ role: 'assistant', content: firstMessage })
+  //   render()
+  //   scrollToBottom()
+  // }, 500)
 }
 
 async function sendMessage() {
