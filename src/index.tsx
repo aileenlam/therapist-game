@@ -391,7 +391,6 @@ app.get('/', (c) => {
                     <i class="fas fa-user-md mr-3"></i>
                     痛症治療師評測及培訓系統
                 </h1>
-                <p class="text-sm text-gray-600">v2.0 - Powered by AI · ACADEMI Standards</p>
             </div>
 
             <!-- Main App Container -->
@@ -402,8 +401,8 @@ app.get('/', (c) => {
             <!-- Footer -->
             <div class="text-center mt-8 text-gray-600 text-sm">
                 <p>
-                    <i class="fas fa-code mr-2"></i>
-                    Built with Hono + Cloudflare Workers + DeepSeek AI
+                    <i class="fas fa-copyright mr-2"></i>
+                    Built & Copyright by Aileen Lam
                 </p>
             </div>
         </div>
