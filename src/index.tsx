@@ -6,6 +6,7 @@ import { getCustomerRolePrompt } from './customerRolesData'
 type Bindings = {
   DB: D1Database
   DEEPSEEK_API_KEY: string
+  LOGIN_PASSWORD?: string  // 可選的登錄密碼（從環境變量讀取）
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -112,7 +113,11 @@ const customerRoles = [
 // 密碼驗證
 app.post('/api/verify-password', async (c) => {
   const { password } = await c.req.json()
-  const isValid = password === 'Aileen!2025'
+  
+  // 🔒 從環境變量讀取密碼（安全）
+  // 如果未設置 LOGIN_PASSWORD，則使用默認值（僅用於開發）
+  const correctPassword = c.env.LOGIN_PASSWORD || 'Aileen!2025'
+  const isValid = password === correctPassword
   
   console.log(`[Auth] Password verification: ${isValid ? 'SUCCESS' : 'FAILED'}`)
   

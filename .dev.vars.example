@@ -1,0 +1,10 @@
+# 環境變量配置範例
+# 複製此文件為 .dev.vars 並填入您的實際配置
+
+# DeepSeek API 密鑰
+# 獲取方式：https://platform.deepseek.com/
+DEEPSEEK_API_KEY=your_deepseek_api_key_here
+
+# 系統登錄密碼（可選）
+# 如果不需要密碼保護，可以留空或移除密碼驗證功能
+LOGIN_PASSWORD=your_password_here

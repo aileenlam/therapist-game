@@ -5,9 +5,21 @@ node_modules/
 dist/
 .wrangler/
 
-# Environment variables
+# Environment variables (包含 API 密鑰和密碼)
 .env
 .dev.vars
+.env.local
+.env.production
+
+# 參考文檔和敏感資料
+*.docx
+*.doc
+*.pdf
+*.xls
+*.xlsx
+*參考*.txt
+*範例*.txt
+*密鑰*.txt
 
 # Runtime data
 *.log
@@ -26,3 +38,16 @@ logs/
 
 # OS
 .DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Database (如果有本地數據庫文件)
+*.db
+*.sqlite
+*.sqlite3
